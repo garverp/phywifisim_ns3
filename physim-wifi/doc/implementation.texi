@@ -1,0 +1,6 @@
+@node Implementation
+@chapter Implementation
+@anchor{chap:physim-wifi:implementation}
+
+The following subsections contain detailed descriptions of the frame construction and reception processes, the implementation of the wireless channel and the 
+interaction of the new PHY with higher layer functions such as MAC busy and idle state signaling.

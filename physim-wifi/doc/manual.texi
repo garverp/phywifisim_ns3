@@ -1,0 +1,66 @@
+\input texinfo  @c -*-texinfo-*-
+
+@setfilename ns-3.info
+@settitle ns-3 manual
+
+@copying
+This is the reference manual for a detailed WiFi physical layer implementation called @emph{PhySim-WiFi}, which models the signal 
+processing logic of a transceiver down to the time sample level. 
+ 
+This document is written in GNU Texinfo and is maintained within the NS-3 module @emph{physim-wifi} located under @code{src/contrib/physim-wifi} 
+of the main NS-3 source tree. The authors of this module are Jens Mittag (@email{jens.mittag@@kit.edu}) and Stylianos Papanastasiou (
+@email{stylianos@@gmail.com}). If you have questions, either contact the NS-3 developers mailinglist (@email{ns-developers@@isi.edu}) or contact 
+the authors directly.
+
+This software is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
+
+This software is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with this program. If not, see @uref{http://www.gnu.org/licenses/}.
+@end copying
+
+@titlepage
+@title NS-3 Reference Manual
+@subtitle Module: PhySim-WiFi
+@author Jens Mittag, Stylianos Papanastasiou
+@author jens.mittag@@kit.edu, stylianos@@gmail.com
+
+@b{PhySim-WiFi version: 1.2}
+@today{}
+
+@vskip 0pt plus 1filll
+@insertcopying
+@page
+@end titlepage
+
+@ifnottex
+@anchor{Full Table of Contents}
+@end ifnottex
+@shortcontents
+
+@menu
+* Architecture::
+* Implementation::
+* Remarks::
+@end menu
+
+@setchapternewpage odd
+@c @headings off
+@everyheading @thischapter @| @| NS-3 PhySim-WiFi manual
+@everyfooting NS-3.9 @| @thispage @| @today
+
+@include architecture.texi
+@include implementation.texi
+@include frame-construction.texi
+@include wireless-channel.texi
+@include frame-reception.texi
+@include phy-state-machine.texi
+@include mac-integration.texi
+@include examples.texi
+@include remarks.texi
+@include changelog.texi
+@c @include annex.texi
+
+@bye

@@ -1,0 +1,46 @@
+
+@node Frame Reception Process
+@section Frame Reception Process
+
+The frame reception process is divided into 4 events within @code{PhySimWifiPhy}, see @ref{fig:physim-reception}: the initial @code{PhySimWifiPhy::StartReceive} 
+event that indicates that the first complex time sample has propagated through the channel and has arrived at the receiver, the @code{PhySimWifiPhy::EndPreamble} 
+event, that indicates that all complex time samples that represent the frame preamble with all of its training symbols have arrived at the receiver, the 
+@code{PhySimWifiPhy::EndHeader} event which expires once all complex time samples that represent the signal header have arrived, and finally the 
+@code{PhySimWifiPhy::EndRx} event, which indicates when the whole frame has finally arrived. 
+
+@float Figure,fig:physim-reception
+@caption{The frame reception process and its division into four distinct events.}
+@center @image{figures/figure4-reception, 5in}
+@end float
+
+At @code{PhySimWifiPhy::StartReceive}, the packet is added to @code{PhySimInterferenceHelper} in order to keep track of the interference added by the
+arriving packet. Further, depending on the current PHY state, that is only if the physical layer is currently in @code{IDLE} or @code{CCA_BUSY} state, a new 
+@code{PhySimWifiPhy::EndPreamble} event is scheduled and it is checked whether a new @code{CCA_BUSY} phase has to be started (e.g. because the cumulative signal 
+energy at the received now exceeds the configured CcaBusyThreshold). Since v1.1, also packet capture is supported, i.e. an @code{PhySimWifiPhy::EndPreamble} event
+is also scheduled if the physical layer is currently in @code{SYNC} or @code{RX} state and if the signal-to-interference noise ratio is greater or equal than 8 dB. 
+For further information regarding packet capture and how it works, please take a look at 
+@uref{http://portal.acm.org/citation.cfm?id=1287772,,"An Experimental Study on the Capture Effect in 802.11a Networks"}.
+
+At @code{PhySimWifiPhy::EndPreamble}, the @code{PhySimSignalDetector} module is used to check whether the repeating pattern of the short training symbols can
+be detected or not. If it can be detected and if the signal-to-interference noise ratio (SINR) is greater than 4 dB and if the physical layer is either in 
+@code{CCA_BUSY}, @code{IDLE} or @code{SYNC} state, it is then assumed that the receiver can lock on to that frame. The 4 dB requirement is introduced in order
+to distinguish multiple preambles (that would be the case if the receiver is in @code{SYNC} state and two preambles are overlapping in time). Then the receiver 
+performs an initial channel estimation also takes place through the @code{PhySimChannelEstimator} module. Afterwards, a @code{PhySimWifiPhy::Endheader} event is 
+scheduled and the physical layer state is changed to @code{SYNC}. 
+
+Note that for all events the cumulative time samples of all arriving packets are used as input for the signal processing. Contrary to v1.0, the signal detection
+mechanism does not process more than the 320 samples of the preamble anymore, since this adds only additional computation time while not increasing the accuracy
+of the simulation.
+
+At @code{PhySimWifiPhy::EndHeader}, the initial channel estimate is applied to all time samples. Afterwards, the header is decoded by applying the reverse signal
+processing steps of the frame construction process. The result is a bit vector that contains the SIGNAL header of the packet. The header is then examined to determine
+the modulation and coding rate used for the rest of the frame, the frame length, and the parity bit. Only if all values in the header are plausible, and the physical
+layer is currently in @code{SYNC} state, a @code{PhySimWifiPhy::EndRx} event is scheduled after the expected end of the packet. In addition the physical layer state is 
+changed to @code{RX}. Please note, that contrary to v1.0, running @code{PhySimWifiPhy::EndPreamble} events are not cancelled any more, since this would disable the
+packet capture feature.
+
+At @code{PhySimWifiPhy::EndRx}, the data symbols are decoded. Again, the initial channel estimate is applied to all time samples. Afterwards, OFDM and bit modulation 
+are reversed and the forward error correction bits are used to correct possible errors. Then, the initial state of the scrambler at the transmitter 
+is recovered and used to re-arrange the bits into their original order. And if the decoded data bits are identical to the transmitted data bits in the end, the
+reception is considered to be successful, and the physical layer state is changed either to @code{IDLE} or @code{CCA_BUSY}, depending on whether the cumulative 
+signal strength is above or below the configured CcaBusyThreshold.     

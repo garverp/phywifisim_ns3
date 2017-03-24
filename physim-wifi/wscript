@@ -1,0 +1,81 @@
+## -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
+
+def configure(conf): 
+    have_itpp = conf.pkg_check_modules('IT++', 'itpp', mandatory=True)
+    conf.env['ENABLE_ITPP'] = have_itpp
+    conf.report_optional_feature("IT++", "IT++ library",
+                                 conf.env['ENABLE_ITPP'],
+                                 "IT++ not found")
+    if conf.env['ENABLE_ITPP']:
+	conf.env.append_value('CXXFLAGS', '-DNO_INT_SIZE_CHECK')
+
+def build(bld):
+    obj = bld.create_ns3_module('physim-wifi', ['network', 'propagation', 'wifi'])
+    obj.source = [
+        'model/physim-blockinterleaver.cc',
+        'model/physim-channel-estimator.cc',
+        'model/physim-convolutional-encoder.cc',
+        'model/physim-helper.cc',
+        'model/physim-interference-helper.cc',
+        'model/physim-ofdm-symbolcreator.cc',
+        'model/physim-propagation-loss-model.cc',
+        'model/physim-scrambler.cc',
+        'model/physim-signal-detector.cc',
+        'model/physim-vehicular-channel-spec.cc',
+        'model/physim-vehicular-TDL-channel.cc',
+        'model/physim-wifi-channel.cc',
+        'model/physim-wifi-phy.cc',
+        'model/physim-wifi-phy-state-helper.cc',
+        'model/physim-wifi-phy-tag.cc',
+        'helper/physim-wifi-helper.cc',
+        ]
+
+    obj_test = bld.create_ns3_module_test_library('physim-wifi')
+    obj_test.source = [
+        'test/physim-wifi-test-suite.cc',
+        'test/physim-wifi-transmitter-receiver-test.cc',
+        'test/physim-wifi-vehicular-channel-test.cc',
+        'test/physim-wifi-state-checker.cc',
+        'test/physim-wifi-simple-estimator-test.cc',
+        'test/physim-wifi-signal-detection-test.cc',
+        'test/physim-wifi-scrambler-test.cc',
+        'test/physim-wifi-noise-chunk-test.cc',
+        'test/physim-wifi-modulator-test.cc',
+        'test/physim-wifi-interleaver-test.cc',
+        'test/physim-wifi-freqoffset-estimator-test.cc',
+        'test/physim-wifi-frame-power-test.cc',
+        'test/physim-wifi-frame-construction-test.cc',
+        'test/physim-wifi-convolutional-test.cc',
+        'test/physim-wifi-cca-busy-test.cc',
+        ]
+
+    headers = bld.new_task_gen(features=['ns3header'])
+    headers.module = 'physim-wifi'
+    headers.source = [
+        'model/physim-blockinterleaver.h',
+        'model/physim-channel-estimator.h',
+        'model/physim-convolutional-encoder.h',
+        'model/physim-helper.h',
+        'model/physim-interference-helper.h',
+        'model/physim-ofdm-symbolcreator.h',
+        'model/physim-propagation-loss-model.h',
+        'model/physim-scrambler.h',
+        'model/physim-signal-detector.h',
+        'model/physim-vehicular-channel-spec.h',
+        'model/physim-vehicular-TDL-channel.h',
+        'model/physim-wifi-channel.h',
+        'model/physim-wifi-phy.h',
+        'model/physim-wifi-phy-state-helper.h',
+        'model/physim-wifi-phy-tag.h',
+        'helper/physim-wifi-helper.h',
+        'test/physim-wifi-state-checker.h',
+        'test/physim-wifi-test-suite.h',
+        ]
+        
+    if (bld.env['ENABLE_EXAMPLES']):
+      	bld.add_subdirs('examples')
+      
+    if bld.env['ENABLE_ITPP']:
+	obj.uselib = 'IT++'
+	obj.env.append_value('CXXDEFINES', "ENABLE_ITPP")
+

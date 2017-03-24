@@ -1,0 +1,16 @@
+
+@node Integration with MAC Layer
+@section Integration with MAC Layer
+
+The physical layer provides feedback to the MAC layer whenever the receiver is in @code{TX}, @code{RX} or @code{CCA_BUSY} state, in order to enable the CSMA
+mechanism of IEEE 802.11. The notification is performed in @code{PhySimWifiPhyStateHelper}, whereas @code{PhySimWifiPhyStateHelper::NotifyRxStart} is used to
+implement the virtual carrier sensing functionality, while @code{PhySimWifiPhyStateHelper::NotifyMaybeCcaBusyStart} is used for the physical carrier sensing counterpart.
+
+In order to trigger the notifications for physical carrier sensing correctly, @code{PhySimWifiPhy} contains two methods  to detect the start of the next 
+@code{CCA_BUSY} phase, start the detected phase and end an already running @code{CCA_BUSY} phase. These are, respectively, @code{PhySimWifiPhy::CheckForNextCcaBusyStart},
+@code{PhySimWifiPhy::StartCcaBusy} and @code{PhySimWifiPhy::EndCcaBusy}. @code{CheckForNextCcaBusyStart} is called whenever the receiver needs to decide whether to
+switch to the @code{IDLE} or @code{CCA_BUSY} state; specifically, it is called after a @code{PhySimWifiPhy::EndRx} event, a failed @code{PhySimWifiPhy::EndPreamble} or a failed 
+@code{PhySimWifiPhy::EndHeader} event, and whenever there is a need to check whether to stay @code{IDLE} or not, as outlined in @code{PhySimWifiPhy::StartReceive}.
+
+Checking whether to turn to a @code{CCA_BUSY} state is made on a per 80 time samples block level by computing the cumulative signal strength of such blocks (cf. 
+@code{PhySimHelper::GetOFDMSymbolSignalStrength}. Once the signal strength exceeds the CcaModelThreshold, the state is switched to @code{CCA_BUSY}. 

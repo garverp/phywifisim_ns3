@@ -1,0 +1,7 @@
+@node Simulation Results
+@chapter Simulation Results
+@anchor{chap:physim-wifi:annex}
+
+In order to check the expected output within a very simple scenario with a single sending node, the manual provides
+packet reception statistics (in particular, packet reception probabilities w.r.t. the signal-to-noise ratio) for 
+different data rates, packet sizes, and wireless channel configurations.

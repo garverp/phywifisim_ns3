@@ -1,0 +1,32 @@
+
+@node Modeling the Wireless Channel Effects
+@section Modeling the Wireless Channel Effects
+
+The wireless channel multiplexer, i.e. the entity that interconnects the @code{PhySimWifiPhy} instances, is implemented in subclasses of type 
+@code{PhySimWifiChannel}. The multiplexer has to be configured to use instances of type @code{PhySimPropagationLossModel} and @code{PropagationDelayModel} 
+in order to apply propagation loss effects (for pathloss, shadowing and fast fading) and propagation delays. 
+
+Currently, two channel multiplexer implementations are available, the classic @code{PhySimWifiUniformChannel} and a @code{PhySimWifiManualChannel}. The uniform 
+multiplexer applies the same propagation and delay models to all wireless links. As such, all links will be exposed to the same channel effects (e.g. all 
+links will experience a ThreeLogDistance pathloss and a Rayleigh fading). In comparison, the @code{PhySimWifiManualChannel} further allows to specify individual 
+delay and propagation loss models for individual links. For instance, one can specify a default ThreeLogDistance pathloss to all links (with a given set of 
+pathloss exponents), and refine the channel conditions between individual nodes by configuring a different pathloss model for those. 
+
+Independent of the used multiplexer, the PhySim WiFi module contains the following propagation loss models, which all operate on the complex time samples in 
+order to reflect pathloss, shadowing or frequency- and time-selective fast-fading effects:
+@itemize
+	@item @code{PhySimFriisSpacePropagationLoss}, in order to apply the well-known Friis Space propagation model
+	@item @code{PhySimConstantPropagationLoss}, in order to apply a constant propagation loss (in dB)
+	@item @code{PhySimLogDistancePropagationLoss}, in order to apply a logarithmic pathloss w.r.t. distance
+	@item @code{PhySimThreeLogDistancePropagationLoss}, in order to use different pathloss exponents for different distance ranges
+	@item @code{PhySimShadowingPropagationLoss}, in order to apply a shadowing effect with a Gaussian normal random variable
+	@item @code{PhySimRicianPropagationLoss}, in order to apply a fast-fading Rician effect (or Rayleigh, if no LOS component is set) that takes also Doppler 
+	      effects into account
+	@item @code{PhySimTappedDelayLinePropagationLoss}, in order to use the multi-tap channel implementations that are included within IT++ (e.g. ITU and 
+	      COST models)
+	@item @code{PhySimVehicularChannelPropagationLoss}, in order to apply sophisticated channel effects, that are based on channel soundings in the 5.9 GHz 
+	      domain using different environments (Urban Canyon, Suburban Street, Expressway) and different experiment setups (Oncoming and Same Direction) 
+@end itemize
+
+For further information about the implemented channel models, interested readers may refer to the API Documentation, which outlines implementation details  
+and gives references to relevant works in the literature.

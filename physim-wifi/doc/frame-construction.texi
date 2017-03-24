@@ -1,0 +1,52 @@
+
+@node Frame Construction Process
+@section Frame Construction Process
+
+The frame construction process starts whenever a @code{SendPacket()} is initiated from higher layers, that is, in a typical case, from @code{MacLow}. Frame construction 
+entails the transformation of individual bits in the packet into a sequence of complex time samples as well as the  creation of a corresponding signal header and a
+preamble containing the OFDM short and long training symbols. The final constructed frame adheres to the frame format illustrated in @ref{fig:physim-frameformat}. 
+
+@float Figure,fig:physim-frameformat
+@caption{IEEE 802.11 PHY format for for the Orthogonal frequency division multiplexing (OFDM) PHY specification for the 5 GHz band.}
+@center @image{figures/figure2-frameformat, 4.5in}
+@end float
+
+In detail, frame construction consists of the following steps:
+@enumerate
+	@item Get the payload of the packet via @code{packet->PeekData()}. The data is transformed to a vector of bits (@code{itpp::bvec}) and either reflects
+	      the real bits of the packet (if given), or a sequence of zero bits. The latter case does not lead to an immediately predictable bit pattern, however,
+              since the bits are randomly scrambled later on in the construction process using a random seed. 
+	@item The preamble of the packet is created using @code{PhySimWifiPhy::ConstructPreamble()}.
+	@item The signal header is created with BPSK modulation and a coding rate of 1/2 using @code{PhySimWifiPhy::ConstructSignalHeader(uint32_t length, 
+	      const WifiMode mode)}.
+	@item The payload of the packet is encoded at the requested WiFi rate using @code{PhySimWifiPhy::ConstructData(const itpp::bvec& bits, const WifiMode mode)}.
+	@item The preamble, the signal header and the data symbols are concatenated into a single vector of complex time samples, i.e. into a @code{itpp::cvec}.
+	@item The energy of the samples produced in the above steps is normalized to unit power and then transmit power and transmitter antenna gain factors are applied to the samples.
+	@item All running @code{EndPreamble}, @code{EndHeader} and @code{EndRx} events are canceled, since it is the task of MAC to prevent transmissions
+	      when the receiver is busy (@ref{Integration with MAC Layer} elaborates on the details).
+	@item The effect of transmitter oscillator offsets, i.e. a slight frequency offset, is applied (to the time samples). 
+	@item A @code{PhySimWifiPhyTag} is created to store the complex time samples and bundle other information that is used by the signal processing 
+	      sub-modules (e.g. channel estimate values, transmit WiFi mode, transmitted data bits).
+	@item Physical layer state is changed through @code{PhySimWifiPhyStateHelper::SwitchToTx}.
+	@item The packet is passed on to @code{PhySimWifiChannel}.
+@end enumerate
+
+@ref{fig:physim-signalprocessing} describes the general signal processing steps that take place within @code{PhySimWifiPhy::ConstructData}. First, the input bits 
+are scrambled by the @code{PhySimScrambler} using a randomly generated scrambling sequence in order to prevent long trails of consecutive 0s and 1s. In the second step, 
+the @code{PhySimConvolutionalEncoder} adds forward error correction bits at a rate that depends on the requested WiFi mode (e.g. at rate 1/2 when using 
+6 Mbps in a 20 MHz channel). Afterwards, the bit sequence is divided into equally sized blocks, whereas each block has to contain exactly the right number of 
+bits that will be constitute one OFDM symbol later (cf. NCBPS parameter of the IEEE 802.11 standard, Section 17). 
+
+@float Figure,fig:physim-signalprocessing
+@caption{The signal processing steps that perform the transformation from bit-level to the final OFDM symbols at signal level.}
+@center @image{figures/figure3-signalprocessing, 4.5in}
+@end float
+
+For each block, the bits are mapped to the correct sub-carriers by the @code{PhySimBlockInterleaver} in order to avoid long runs of low reliability bits, 
+then modulated according to the requested WiFi mode (i.e. either using BPSK, QPSK, 16-QAM or 64-QAM) and, finally, passed on to the OFDM modulator. 
+The OFDM modulator inserts four pilot symbols at pre-defined sub-carrier positions; these can later be used by the receiver to track the channel characteristics over time. The last two steps are 
+implemented within the @code{PhySimOFDMSymbolCreator} and the result of all the signal processing steps described above is a sequence of complex time samples, 
+where each block of 80 time samples corresponds to one OFDM symbol.
+
+In @code{PhySimWifiPhy::ConstructSignalHeader}, the same sequence of signal processing steps as above is used, except that there is no scrambling of bits and the simplest modulation scheme (BPSK) 
+and a coding rate of 1/2 are used. 

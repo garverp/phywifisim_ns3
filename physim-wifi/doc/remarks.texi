@@ -1,0 +1,15 @@
+@node Additional Remarks
+@chapter Additional Remarks
+@anchor{chap:physim-wifi:remarks}
+
+The current implementation is already stable and all the OFDM based communication modes are working and validated, either against the reference values
+of the example in Annex G of the IEEE 802.11 (2007) standard, against the CMU channel emulator testbed at Chalmers (see the publication mentioned in the 
+beginning of this manual), or against theoretical results and curves. However, the current implementation has a few minor missing features, that will be added 
+in a following up release:
+
+@itemize
+	@item No multi-channel operation support so far
+	@item It is possible to mix different data rates, as long as they share the same channel bandwidth. However, multiple (and overlapping) channels using
+	      different channel bandwidths (e.g. 10 and 20 MHz channels) are not supported, since different channel bandwidths imply different complex sample
+	      durations, which are not currently handled by the @code{PhySimInterferenceHelper}. 
+@end itemize 

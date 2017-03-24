@@ -1,0 +1,38 @@
+@node Changelog
+@chapter Changelog
+@anchor{chap:physim-wifi:changelog}
+
+@node Changes from v1.1 to v1.2
+@section Changes from v1.1 to v1.2
+
+@itemize
+	@item Fix of an equation error in @code{PhySimLogDistancePropagationLoss::DoCalcRxPower}: instead of calculating @code{log10 (m_distance / m_referenceDistance)}, a @code{log10 (m_referenceDistance / m_distance)} was used in v1.1.
+	@item An implementation of the method @code{PhySimInterferenceHelper::GetNoiseFloorDbm} was added.
+	@item The attributes of @code{ns3::PhySimShadowingPropagationLoss} were renamed to @code{StandardDeviation} and @code{MinimumDistance}.
+	@item Added configuration of IEEE 802.11g modes in @code{PhySimWifiPhy::ConfigureStandard}.
+	@item Update in @code{PhySimWifiPhy::StartReceive} to properly handle the case of packet capture during @code{SYNCING} and @code{RX} states: now we notify a RxDrop in case that capture is not successful and tag the packet as being captured if it is successful.
+	@item More time samples are used for preamble detection in @code{PhySimWifiPhy::EndPreamble}.
+	@item If a packet is captured in @code{PhySimWifiPhy::EndPreamble}, it is tagged as being captured (using the @code{PhySimWifiPhyTag} object).
+	@item A rare but significant bug in @code{PhySimWifiPhy::EndPreamble} has been fixed: so far, running EndCcaBusy events have not been canceled in case of successful preamble detection, which is, however, required to avoid unallowed state transitions.
+	@item Bugfix in @code{PhySimWifiPhy::EndHeader}: it is necessary to check for a new CcaBusy period in case header decoding did not succeed.
+@end itemize 
+
+
+@node Changes from v1.0 to v1.1
+@section Changes from v1.0 to v1.1
+
+@itemize
+	@item A bug in Payload and Overall SINR Computation which let the whole simulation crash was fixed.
+	@item The frequency offsets are modeled through a triangular variable instead of a uniform variable and have been moved from @code{PhySimWifiPhy::SendPacket} to @code{PhySimWifiPhy::StartReceive} (thanks to Michele Segata).
+              In order to generate the frequency offset between sender and receiver, a triangular random variable is used. This choice derives from the following formulation. The frequency offset between sender and receiver is the difference between the @emph{central} frequencies of the two wireless card, so @math{F_{off} = F_{tx} - F_{rx} = F_{0} + Err_{tx} - (F_{0} + Err_{rx}) = Err_{tx} - Err_{rx}} where F_tx and F_rx are the frequencies of sender and receiver respectively, F_0 the center frequency (e.g., 5.9 GHz for 802.11p), and Err_tx and Err_rx the errors in frequency of sender and receiver respectively. Assuming Err_tx and Err_rx being two uniformly distributed random variables between -1 and 1 (multiplied by the offset tolerance as mandated by the standard like, e.g., 20 ppm for 20 MHz channel), the result of their difference is a triangular distribution between -2 and 2. Actually, the real distribution of central frequencies is generally not uniform, but it should depend on the technology used. We could expect a more concentrated distribution for modern devices. Uniform distribution is a worst-case scenario, but in the absence of vendor-provided distributions this is the best we can do and it is good to test feasibility.
+	@item Signal detector was improved and a default correlation threshold of 0.85 is configured. This translates to a minimum of 5db SNR in order to correctly detect the preamble. Please note that this only works in the absence of interference. In case of interference, an additional SINR check of 4dB is introduced to distinguish overlapping preambles.
+	@item The accuracy of the SpeedOfLight value/attribute in @code{ConstantSpeedPropagationDelayModel} was increased.
+	@item New trace sources have been added: StartRx, StartRxError and EnergyDetectionFailed. Furthermore, the trace sources PreambleError, HeaderError and RxError have been extended to include also an error reason. The reasons are defined @code{enum PhySimWifiPhy::ErrorReason}
+	@item Frequency tolerance for 802.11p has been set to 20ppm again.
+	@item A memory leak in @code{PhySimWifiPhy::EndRx} was resolved
+	@item The @code{PhySimInterferenceHelper} class has now an optimization parameter/attribute called @code{MaximumPacketDuration} that can be used to reduce the amount of memory/history. This can be useful if the maximum packet duration is known prior to simulation, and memory consumption shall be reduced.
+	@item A vector out of bound error in @code{PhySimWifiPhy::EndPreamble} was fixed.
+	@item A rare bug in @code{PhySimInterferenceHelper::GetBackgroundNoise}, in particular within case 3 of this method, was fixed.
+	@item Two bugs in the computation of V2V_EXPRESSWAY_ONCOMING and V2V_URBAN_CANYON_ONCOMING have been fixed.
+	@item Packet capture capabilities have been added.
+@end itemize 

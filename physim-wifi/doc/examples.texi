@@ -1,0 +1,171 @@
+@node Examples and Usage
+@chapter Examples and Usage
+@anchor{chap:physim-wifi:examples}
+
+@node How to use PhySimWifiPhy instead of YansWifiPhy
+@section How to use @code{PhySimWifiPhy} instead of @code{YansWifiPhy} 
+
+When using the @code{YansWifiPhy} implementation, one would use something similar to the following example code to configure and set everything up.
+@*
+@smallformat
+@verbatim
+  #include "ns3/wifi-module.h"
+
+  YansWifiChannelHelper wifiChannel;
+  wifiChannel.AddPropagationLoss("ns3::FixedRssLossModel");
+  wifiChannel.SetPropagationDelay("ns3::ConstantSpeedPropagationDelayModel");
+
+  YansWifiPhyHelper wifiPhy = YansWifiPhyHelper::Default();
+  wifiPhy.SetChannel(wifiChannel.Create());
+
+  WifiHelper wifi = WifiHelper::Default();
+  wifi.SetStandard(WIFI_PHY_STANDARD_80211a);
+  NqosWifiMacHelper wifiMac = NqosWifiMacHelper::Default ();
+  wifiMac.SetType ("ns3::AdhocWifiMac");
+  wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager",
+    "DataMode", StringValue ("OfdmRate6Mbps"),
+    "NonUnicastMode", StringValue ("OfdmRate6Mbps"));
+
+  NodeContainer nodes; 
+  nodes.Create(2);
+
+  wifi.Install (wifiPhy, wifiMac, nodes);
+@end verbatim
+@end smallformat
+
+@*
+In order to use the @code{PhySimWifiPhy} implementation instead of @code{YansWifiPhy}, one has to replace the @code{YansWifiChannelHelper} and 
+@code{YansWifiPhyHelper} classes with @code{PhySimWifiChannelHelper} and @code{PhySimWifiPhyHelper} only, see below.
+@*
+@smallformat
+@verbatim
+  #include "ns3/wifi-module.h"
+  #include "ns3/physim-wifi-module.h"
+
+  PhySimWifiChannelHelper wifiChannel;
+  wifiChannel.AddPropagationLoss("ns3::PhySimConstantPropagationLoss");
+  wifiChannel.SetPropagationDelay("ns3::ConstantSpeedPropagationDelayModel");
+
+  PhySimWifiPhyHelper wifiPhy = PhySimWifiPhyHelper::Default();
+  wifiPhy.SetChannel(wifiChannel.Create());
+ 
+  WifiHelper wifi = WifiHelper::Default();
+  wifi.SetStandard(WIFI_PHY_STANDARD_80211a);
+  NqosWifiMacHelper wifiMac = NqosWifiMacHelper::Default ();
+  wifiMac.SetType ("ns3::AdhocWifiMac");
+  wifi.SetRemoteStationManager ("ns3::ConstantRateWifiManager",
+    "DataMode", StringValue ("OfdmRate6Mbps"),
+    "NonUnicastMode", StringValue ("OfdmRate6Mbps"));
+
+  NodeContainer nodes;
+  nodes.Create(2);
+
+  wifi.Install (wifiPhy, wifiMac, nodes);
+@end verbatim 
+@end smallformat
+
+@node How to trace events from PhySimWifiPhy
+@section How to trace events from @code{PhySimWifiPhy}
+
+The whole implementation can act as a trace source at the occurence of different events. The most interesting and important events are probably the ones
+published in PhySimWifiPhy itself.
+@*
+@smallformat
+@verbatim
+  void PhyTxTrace (std::string context, Ptr<const Packet> p, 
+                   Ptr<const PhySimWifiPhyTag> tag);
+  void PhyStartRxTrace (std::string context, Ptr<const Packet> p, 
+                   Ptr<const PhySimWifiPhyTag> tag);
+  void PhyStartRxErrorTrace (std::string context, Ptr<const Packet> p, 
+                   Ptr<const PhySimWifiPhyTag> tag, enum PhySimWifiPhy::ErrorReason reason);
+  void PhyEnergyDetectionFailedTrace (std::string context, Ptr<const Packet> p, 
+                   Ptr<const PhySimWifiPhyTag> tag);
+
+  void PhyRxOkTrace (std::string context, Ptr<const Packet> p, 
+                   Ptr<const PhySimWifiPhyTag> tag);
+  void PhyHeaderOkTrace (std::string context, Ptr<const Packet> p, 
+                   Ptr<const PhySimWifiPhyTag> tag);
+  void PhyPreambleOkTrace (std::string context, Ptr<const Packet> p, 
+                   Ptr<const PhySimWifiPhyTag> tag);
+  void PhyRxErrorTrace (std::string context, Ptr<const Packet> p, 
+                   Ptr<const PhySimWifiPhyTag> tag, enum PhySimWifiPhy::ErrorReason reason);
+  void PhyHeaderErrorTrace (std::string context, Ptr<const Packet> p, 
+                   Ptr<const PhySimWifiPhyTag> tag, enum PhySimWifiPhy::ErrorReason reason);
+  void PhyPreambleErrorTrace (std::string context, Ptr<const Packet> p, 
+                   Ptr<const PhySimWifiPhyTag> tag, enum PhySimWifiPhy::ErrorReason reason);
+  void PhyCcaBusyStart (std::string context, Ptr<const NetDevice> device, Time duration);
+
+  Config::Connect ("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/Phy/Tx", 
+                   MakeCallback(&PhyTxTrace) );
+  Config::Connect ("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/Phy/StartRx", 
+                   MakeCallback(&PhyStartRxTrace) );
+  Config::Connect ("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/Phy/StartRxError", 
+                   MakeCallback(&PhyStartRxErrorTrace) );
+  Config::Connect ("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/Phy/EnergyDetectionFailed", 
+                   MakeCallback(&PhyEnergyDetectionFailedTrace) );
+  Config::Connect ("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/Phy/RxOk", 
+                   MakeCallback(&PhyRxOkTrace) );
+  Config::Connect ("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/Phy/HeaderOk", 
+                   MakeCallback(&PhyHeaderOkTrace) );
+  Config::Connect ("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/Phy/PreambleOk", 
+                   MakeCallback(&PhyPreambleOkTrace) );
+  Config::Connect ("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/Phy/RxError", 
+                   MakeCallback(&PhyRxErrorTrace) );
+  Config::Connect ("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/Phy/HeaderError", 
+                   MakeCallback(&PhyHeaderErrorTrace) );
+  Config::Connect ("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/Phy/PreambleError", 
+                   MakeCallback(&PhyPreambleErrorTrace) );
+  Config::Connect ("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/Phy/CcaBusyStart", 
+                   MakeCallback(&PhyCcaBusyStart) ); 
+@end verbatim 
+@end smallformat
+
+@*
+Apart from the above, there is also a trace source available in @code{PhySimWifiPhyStateHelper} which allows the user to be notified about all the physical layer state 
+changes and transitions.
+@*
+@*
+@smallformat
+@verbatim
+  void StateLogger (std::string context, Ptr<NetDevice>, Time start, Time end , 
+                    enum PhySimWifiPhy::State state);
+  Config::Connect ("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/Phy/State/State", 
+                   MakeCallback(&StateLogger));
+@end verbatim 
+@end smallformat
+
+@node How to change the signal processing configuration
+@section How to change the signal processing configuration
+
+The signal processing modules offer quite a few configuration parameters. For instance, the correlation threshold or the correlation technique of the signal 
+detector can be set through the NS-3 attribute system. A user may also enable or disable soft decision decoding, oscillator effects, random scrambler initialization 
+and other features. Since all these parameters are documented within the source code and exposed through the doxygen generated API documentation, this manual 
+refers to the API documentation for a detailed description of all those parameters.  
+
+However, there is a small issue in the way NS-3 configures the Wifi standard, which prevents the proper change of default attributes after setting the physical layer to 
+a specific IEEE standard. For instance if you use the following code to first configure @code{PhySimWifiPhy} to reflect a IEEE 802.11a setup and then want to 
+change the CCA threshold from the default -62 dBm to -82 dBm, it won't work. The reason is that the attribute system does not apply the changes in chronological 
+order. 
+@*
+@smallformat
+@verbatim
+  WifiHelper wifi = WifiHelper::Default();
+  wifi.SetStandard(WIFI_PHY_STANDARD_80211a);
+  Config::SetDefault ("ns3::PhySimWifiPhy::CcaModelThreshold", DoubleValue (-82.0));
+@end verbatim 
+@end smallformat
+@*
+The proper way of doing this would be to not change the default value for the object instantiation, but to change the value after the physical layer has been
+created by using the corresponding @code{Config::Set} call, see blow. 
+@*
+@smallformat
+@verbatim
+  WifiHelper wifi = WifiHelper::Default();
+  wifi.SetStandard(WIFI_PHY_STANDARD_80211a);
+  Config::Set ("/NodeList/*/DeviceList/*/$ns3::WifiNetDevice/Phy/CcaModelThreshold", 
+               DoubleValue (-82.0));
+@end verbatim 
+@end smallformat
+@*
+This issue is existing for the @code{PhySimWifiPhy} attributes @code{CcaModelThreshold}, @code{Frequency}, @code{TxCenterFrequencyTolerance} and 
+@code{SymbolTime}. 

@@ -1,0 +1,9 @@
+## -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
+
+def build(bld):
+	obj = bld.create_ns3_program('physim-1sender-only-pathloss', ['core', 'common', 'physim-wifi'])
+	obj.source = 'physim-1sender-only-pathloss.cc'
+	obj = bld.create_ns3_program('physim-1sender-only-rayleigh', ['core', 'common', 'physim-wifi'])
+	obj.source = 'physim-1sender-only-rayleigh.cc'
+	obj = bld.create_ns3_program('physim-regression-test', ['core', 'common', 'physim-wifi'])
+	obj.source = 'physim-regression-test.cc'

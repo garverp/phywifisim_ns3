@@ -1,0 +1,63 @@
+@node Introduction
+@chapter Introduction
+@anchor{chap:physim-wifi:introduction}
+
+This module contains a physical layer implementation of the OFDM-based IEEE 802.11 standard, more precisely, for the Orthogonal 
+frequency division multiplexing (OFDM) PHY specification for the 5 GHz band@footnote{see Section 17 of the IEEE 802.11 (2007) standard}. 
+It can be used as a drop-in replacement for the official @code{YansWifiPhy} implementation when higher simulation accuracy is required.
+
+The NS-3 default physical layer, @code{YansWifiPhy}, implements a packet-level PHY model which abstracts channel effects on individual packet bits  
+by using average bit-error rates w.r.t. signal-to-noise and interference ratios to determine whether a packet is successfully received. In contrast,
+ the @code{PhySimWifiPhy} implementation performs all signal processing steps that a real transceiver would follow when decoding a frame. As such, 
+individual bits are explicitly considered and detailed lower-layer techniques such as bit interleaving, forward error correction, OFDM modulation and so 
+on are applied. The end result of accounting for these mechanisms is a detailed and accurate signal representation, allowing consideration of effects 
+such as frequency- and time-selective fading as well as enabling evaluation of the impact of advanced physical layer signal processing algorithms
+on the performance of the whole network. Further, by modeling the physical layer at this granularity, existing and new wireless 
+channel models can easily be implemented and plugged into the simulator, without the need to build empirical bit-error or packet-error rates. 
+For additional information on the motivation of this work, consult the publications
+@uref{http://ieeexplore.ieee.org/search/srchabstract.jsp?tp=&arnumber=5506341,,"Bridging the Gap between Physical Layer Emulation and Network Simulation"} or
+@uref{http://ieeexplore.ieee.org/search/srchabstract.jsp?tp=&arnumber=5713803,,"Enabling Accurate Cross-Layer PHY/MAC/NET Simulation Studies of Vehicular Communication Networks"}.
+
+@ref{fig:physim-architecture} shows the conceptual architecture of the @code{PhySimWifiPhy} implementation, how it interacts with the existing WiFi MAC 
+layer implementation and which sub-modules (i.e. signal processing modules) are used to simulate the frame construction and frame reception of a  
+transceiver. In the following, the manual gives a basic overview of the frame transmission and reception process. Further details are then provided in 
+@ref{Implementation}.  
+
+@float Figure,fig:physim-architecture
+@caption{Architecture of the PhySimWifi implementation: how it connects to the existing WiFi MAC implementation and which sub-modules are used to 
+simulate the frame construction and frame reception process.}
+@center @image{figures/figure1-architecture, 4.5in}
+@end float
+
+Whenever the MAC layer triggers a @code{SendPacket()} request on a @code{PhySimWifiPhy} instance, the frame construction process is started and a transition from 
+packet-level to bit-level and from bit-level to signal-level is performed. To do so, the data bits of the packet are taken as an input (if given; if not, 
+a random bit sequence that corresponds to the payload length is generated) and the functionality of several sub-modules is used to achieve the transformation. 
+The necessary sub-modules are called @code{PhySimConvolutionalEncoder}, @code{PhySimBlockInterleaver}, @code{PhySimScrambler} and @code{PhySimOFDMSymbolCreator}, 
+and they correspond to the transformations specified in the IEEE 802.11 standard for OFDM-based transmission. @ref{Frame Construction Process} of
+this manual elaborates further on the details of the frame construction process. 
+
+After the complex time samples, which constitute the packet, have been generated, the packet is passed down to the wireless channel (which is of type 
+@code{PhySimWifiChannel}). The channel computes the propagation delay (using the existing @code{PropagationDelayModel} implementations), applies a propagation 
+loss (using sub-classes of @code{PhySimPropagationLossModel}) and schedules a corresponding @code{StartReceive()} event at the receiving @code{PhySimWifiPhy}
+@footnote{The term `receiving' might be misleading here, since the frame might arrive, but not be received,  because the physical layer might not be able to 
+detect the frame or synchronize to it.}. For further details on how a propagation loss model can manipulate the signal, look at @ref{Modeling the Wireless Channel Effects}.
+
+When the @code{StartReceive()} event expires, the incoming packet is first added to the  @code{PhySimInterferenceHelper} module, which keeps track of all 
+currently incoming frames. Afterwards, the reception process begins, depending on the current transmission and reception state of the receiving 
+physical layer. During the reception process, two additional sub-modules are used, apart from the ones already mentioned in the transmission process, namely 
+@code{PhySimSignalDetector} and @code{PhySimChannelEstimator}. Further implementation details are described in @ref{Frame Reception Process}. 
+
+Note that the increase in simulation accuracy is accompanied by an increase in computional effort. Depending on the WiFi mode used, the number of network nodes simulated, the amount of packets
+and data bits transmitted and the used channel models, the simulation can be up to 1000 or 10000 times slower than the default @code{YansWifiPhy} 
+implementation. In general, simulation requirements decrease with lower amounts of transmitted data, higher PHY data rates (transmission mode)  and simpler channel models.
+ A future version will include optional support for OpenCL, such that the signal processing parts can be parallelized, e.g. through the usage of recent GPGPUs 
+with multiple compute units and cores (cf. @uref{http://dsn.tm.uni-karlsruhe.de/english/article.php?publication_id=219&language_id=2,,"GPU-based Architectures and their Benefit for Accurate and Efficient Wireless Network Simulations"} for initial performance results). 
+
+@node System Requirements
+@section System Requirements
+
+The following libraries are required to build and use the @code{PhySimWifiPhy} implementation:
+@itemize
+	@item @uref{http://itpp.sourceforge.net/,,IT++ Signal Processing Library}, Version 4.0.6 or higher
+@end itemize
+ 

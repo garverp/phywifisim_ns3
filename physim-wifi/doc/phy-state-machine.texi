@@ -1,0 +1,19 @@
+
+@node Physical Layer State Machine
+@section Physical Layer State Machine
+
+Based on the frame format and the events of the reception process, the physical layer distinguishes between 5 different states, see 
+@ref{fig:physim-statemachine}: the @code{TX} state, which is active when the physical layer is transmitting a packet, the @code{IDLE} state, 
+which is active whenever no reception process is going on and the whenever the cumulative signal strength is below the CcaModelThreshold, the @code{CCA_BUSY}
+state, which is similar to @code{IDLE}, except that the signal strength is above CcaModelThreshold, the @code{SYNC} state, which reflects the situation that
+a preamble has been detected and locked on to, and finally the @code{RX} state, which is active whenever the receiver is decoding the payload of a packet. 
+
+@float Figure,fig:physim-statemachine
+@caption{The state machine of the physical layer implementation and the allowed transitions between those states.}
+@center @image{figures/figure5-statemachine, 4in}
+@end float
+
+The transitions of the physical layer state machine are implemented through @code{PhySimWifiPhyStateHelper}, which is responsible for transition checks (e.g. 
+if a transition from the current state into a new state is allowed) and the notification of other layers, e.g. the MAC@footnote{Please note that the state machine
+presented in @uref{http://ieeexplore.ieee.org/search/srchabstract.jsp?tp=&arnumber=5506341,,"Bridging the Gap between Physical Layer Emulation and Network Simulation"} 
+is incorrect and allows (by mistake) a transition from @code{CCA_BUSY} to @code{TX}.}.
