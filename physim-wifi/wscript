@@ -3,11 +3,15 @@
 def configure(conf): 
     have_itpp = conf.pkg_check_modules('IT++', 'itpp', mandatory=True)
     conf.env['ENABLE_ITPP'] = have_itpp
+    #conf.env['ENABLE_ITPP'] = True
     conf.report_optional_feature("IT++", "IT++ library",
                                  conf.env['ENABLE_ITPP'],
                                  "IT++ not found")
     if conf.env['ENABLE_ITPP']:
 	conf.env.append_value('CXXFLAGS', '-DNO_INT_SIZE_CHECK')
+        conf.env.append_value('CXXFLAGS','-Wno-error=deprecated-register')
+        conf.env.append_value('CXXFLAGS','-Wno-error=reorder')
+        conf.env.append_value('CXXFLAGS','-Wno-error=overloaded-virtual')
 
 def build(bld):
     obj = bld.create_ns3_module('physim-wifi', ['network', 'propagation', 'wifi'])
@@ -49,7 +53,7 @@ def build(bld):
         'test/physim-wifi-cca-busy-test.cc',
         ]
 
-    headers = bld.new_task_gen(features=['ns3header'])
+    headers = bld(features='ns3header')
     headers.module = 'physim-wifi'
     headers.source = [
         'model/physim-blockinterleaver.h',
