@@ -33,7 +33,7 @@
 #include "ns3/error-rate-model.h"
 #include "ns3/simulator.h"
 #include "ns3/packet.h"
-#include "ns3/random-variable.h"
+#include "ns3/random-variable-stream.h"
 #include "ns3/assert.h"
 #include "ns3/log.h"
 #include "ns3/double.h"
@@ -192,10 +192,12 @@ PhySimWifiPhy::GetTypeId (void)
 }
 
 PhySimWifiPhy::PhySimWifiPhy ()
-  : m_random (0.0, 1.0),
-    m_estimator (0)
+  : m_estimator (0)
 {
   NS_LOG_FUNCTION (this);
+  m_random = CreateObject<UniformRandomVariable>();
+  m_random->SetAttribute("Min",DoubleValue(0.0));
+  m_random->SetAttribute("Max",DoubleValue(1.0));
   m_state = CreateObject<PhySimWifiPhyStateHelper> ();
 
   m_shortSymbol

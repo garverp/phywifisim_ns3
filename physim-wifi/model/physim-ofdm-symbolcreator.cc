@@ -37,7 +37,8 @@ namespace ns3 {
 NS_OBJECT_ENSURE_REGISTERED (PhySimOFDMSymbolCreator);
 
 const itpp::cvec PhySimOFDMSymbolCreator::m_subcarrierValues = "1 1 1 -1";
-const uint32_t PhySimOFDMSymbolCreator::m_subcarrierPolarity[]
+// Was originally unsigned, WHY??
+const int32_t PhySimOFDMSymbolCreator::m_subcarrierPolarity[]
   = {
   1, 1, 1, 1, -1, -1, -1, 1, -1, -1, -1, -1, 1, 1, -1, 1, -1, -1, 1, 1, -1, 1, 1, -1,
   1, 1, 1, 1, 1, 1, -1, 1, 1, 1, -1, 1, 1, -1, -1, 1, 1, 1, -1, 1, -1, -1, -1, 1, -1,

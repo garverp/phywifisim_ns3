@@ -1,9 +1,8 @@
 ## -*- Mode: python; py-indent-offset: 4; indent-tabs-mode: nil; coding: utf-8; -*-
 
 def configure(conf): 
-    have_itpp = conf.pkg_check_modules('IT++', 'itpp', mandatory=True)
+    have_itpp = conf.check_cfg(package='itpp',msg='Checking for IT++',mandatory=True);
     conf.env['ENABLE_ITPP'] = have_itpp
-    #conf.env['ENABLE_ITPP'] = True
     conf.report_optional_feature("IT++", "IT++ library",
                                  conf.env['ENABLE_ITPP'],
                                  "IT++ not found")
@@ -12,7 +11,7 @@ def configure(conf):
         conf.env.append_value('CXXFLAGS','-Wno-error=deprecated-register')
         conf.env.append_value('CXXFLAGS','-Wno-error=reorder')
         conf.env.append_value('CXXFLAGS','-Wno-error=overloaded-virtual')
-
+        conf.env.append_value('CXXFLAGS','-Wno-error=deprecated-declarations')
 def build(bld):
     obj = bld.create_ns3_module('physim-wifi', ['network', 'propagation', 'wifi'])
     obj.source = [

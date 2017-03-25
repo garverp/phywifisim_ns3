@@ -84,7 +84,7 @@ private:
   itpp::OFDM m_ofdm;
 
   // ! Polarity of symbols (according to 17-25 in Standard)
-  static const uint32_t m_subcarrierPolarity[127];
+  static const int32_t m_subcarrierPolarity[127];
 
   // ! Subcarrier values for each OFDM symbol (according to 17-24 in Standard)
   static const itpp::cvec m_subcarrierValues;

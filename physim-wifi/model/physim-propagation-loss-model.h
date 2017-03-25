@@ -26,7 +26,7 @@
 #define PHYSIM_PROPAGATION_LOSS_MODEL_H
 
 #include "ns3/object.h"
-#include "ns3/random-variable.h"
+#include "ns3/random-variable-stream.h"
 #include <itpp/itcomm.h>
 #include "physim-wifi-phy.h"
 #include "physim-vehicular-channel-spec.h"
@@ -292,7 +292,7 @@ private:
   double m_stdDeviationDb; // standard deviation of shadowing fading (in dB)
   double m_minDistance; // minimum distance to apply this from
 
-  NormalVariable *m_normalVariable;
+  Ptr<NormalRandomVariable> m_normalVariable;
 
 };
 
@@ -324,7 +324,7 @@ private:
   double m_minRelativeSpeed;
   double m_lineOfSightPower;
   double m_lineOfSightDoppler;
-  static const double m_max_time_static = 1e-2;
+  static constexpr double const m_max_time_static = 1e-2;
   itpp::Rice_Fading_Generator* m_generator;
 };
 

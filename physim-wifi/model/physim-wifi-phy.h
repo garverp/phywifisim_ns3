@@ -34,7 +34,7 @@
 #include "ns3/traced-callback.h"
 #include "ns3/nstime.h"
 #include "ns3/ptr.h"
-#include "ns3/random-variable.h"
+#include "ns3/random-variable-stream.h"
 #include "ns3/net-device.h"
 #include "ns3/wifi-phy.h"
 #include "ns3/wifi-mode.h"
@@ -415,7 +415,7 @@ private:
 
   EventId m_startCcaBusyEvent;
   EventId m_endCcaBusyEvent;
-  UniformVariable m_random;
+  Ptr<UniformRandomVariable> m_random;
   WifiPhyStandard m_standard;
   Ptr<PhySimWifiPhyStateHelper> m_state;
   Ptr<PhySimInterferenceHelper> m_interference;
@@ -471,7 +471,7 @@ private:
   static itpp::cvec m_cachedPreamble;
 
   // A random variable for frequency offset generation
-  RandomVariable m_frequencyOffsetGenerator;
+  Ptr<RandomVariableStream> m_frequencyOffsetGenerator;
 };
 
 /**
