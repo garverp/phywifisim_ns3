@@ -733,9 +733,11 @@ PhySimWifiPhy::StartReceivePacket (Ptr<Packet> packet,
 }
 
 void
-PhySimWifiPhy::SendPacket (Ptr<const Packet> packet, WifiMode mode, enum WifiPreamble preamble, uint8_t txPowerLevel)
+PhySimWifiPhy::SendPacket (Ptr<const Packet> packet, WifiTxVector txVector, 
+                        enum WifiPreamble preamble, enum mpduType mpdutype)
 {
-  NS_LOG_FUNCTION (this << packet << mode << preamble << (uint32_t) txPowerLevel);
+  uint8_t txPowerLevel = txVector.GetTxPowerLevel();
+  NS_LOG_FUNCTION (this << packet << preamble << (uint32_t) txPowerLevel);
   NS_LOG_DEBUG ("PhySimWifiPhy:SendPacket() " << Simulator::Now ());
   NS_LOG_DEBUG ("PhySimWifiPhy:SendPacket() current state = " << m_state->GetState ());
 

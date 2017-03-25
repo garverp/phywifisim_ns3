@@ -187,11 +187,12 @@ public:
    * Serves the transmission requests coming from upper layers, in the sense that the packet is transformed from packet to bit, from bit to
    * signal level and then put on the wireless channel.
    * \param packet       The packet that shall be sent
-   * \param mode         The WiFi mode that indicates at wich data rate the data bits shall be encoded
+   * \param WifiTxVector The TXVECTOR of transmission parameters
    * \param preamble     The preamble type that shall be used
-   * \param txPowerLevel The transmission power level to be used for this transmission
+   * \param mpdutype The type of MPDU (WifiPhy::mpduType)
    */
-  virtual void SendPacket (Ptr<const Packet> packet, WifiMode mode, enum WifiPreamble preamble, uint8_t txPowerLevel);
+  virtual void SendPacket(Ptr<const Packet> packet,WifiTxVector txVector, enum WifiPreamble preamble,
+                          enum mpduType mpdutype);
   virtual void RegisterListener (WifiPhyListener *listener);
   /**
    * Returns whether the state of the physical layer is currently CCA_BUSY
@@ -238,11 +239,11 @@ public:
    * Note: This is not possible to compute anymore, since this physical layer implementation is not based on
    * statistics, but checks explicitly whether all bits are decoded correctly or not. Consequently, this method
    * returns always zero, no matter which parameters are given.
-   * \param txMode The WiFi mode for which the minimum SINR is requested
+   * \param WifiTxVector txVector Transmission Vector
    * \param ber    The maximum BER that is accepted
    * \return       The calculated SINR. So far, we always return 0.0
    */
-  virtual double CalculateSnr (WifiMode txMode, double ber) const;
+  virtual double CalculateSnr (WifiTxVector txVector, double ber) const;
   /**
    * Set the channel number to use for transmissions. This sets the center frequency at which is operated and
    * the physical channel over which packets are sent and received. The numbering scheme that is used is the same
