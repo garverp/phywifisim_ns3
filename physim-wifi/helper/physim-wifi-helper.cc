@@ -167,6 +167,11 @@ PhySimWifiChannelHelper::Create (void) const
   return channel;
 }
 
+int64_t
+PhySimWifiChannelHelper::AssignStreams (Ptr<PhySimWifiChannel> c, int64_t stream)
+{
+  return c->AssignStreams (stream);
+}
 
 PhySimWifiPhyHelper::PhySimWifiPhyHelper ()
   : m_channel (0),
@@ -200,7 +205,7 @@ PhySimWifiPhyHelper::Set (std::string name, const AttributeValue &v)
 }
 
 Ptr<WifiPhy>
-PhySimWifiPhyHelper::Create (Ptr<Node> node, Ptr<WifiNetDevice> device) const
+PhySimWifiPhyHelper::Create (Ptr<Node> node, Ptr<NetDevice> device) const
 {
   Ptr<PhySimWifiPhy> phy = m_phy.Create<PhySimWifiPhy> ();
   phy->SetChannel (m_channel);

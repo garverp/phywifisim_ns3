@@ -146,9 +146,9 @@ PhySimWifiPhy::GetTypeId (void)
                    MakeUintegerChecker<uint32_t> ())
     .AddAttribute ("FrequencyOffset", "A RandomVariable used to determine the frequency offset due to oscillator effects."
                    "Typically, one uses a TriangularVariable here using (-2, 2, 0) as configuration parameters",
-                   RandomVariableValue (TriangularVariable(-2, 2, 0)),
-                   MakeRandomVariableAccessor (&PhySimWifiPhy::m_frequencyOffsetGenerator),
-                   MakeRandomVariableChecker ())
+                   StringValue("ns3::TriangularRandomVariable"),
+                   MakePointerAccessor(&PhySimWifiPhy::m_frequencyOffsetGenerator),
+                   MakePointerChecker<RandomVariableStream>())
     .AddAttribute ("ChannelEstimator",
                    "Defines the channel estimator implementation which shall be used for this Phy",
                    StringValue ("ns3::PhySimChannelFrequencyOffsetEstimator"),

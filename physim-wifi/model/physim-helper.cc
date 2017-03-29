@@ -318,26 +318,30 @@ PhySimHelper::GetWifiMode (const itpp::bvec &bits, WifiMode &mode)
 }
 
 uint32_t
-PhySimHelper::GetNCBPS (const WifiMode mode)
+PhySimHelper::GetNCBPS (const WifiTxVector txVector)
 {
+  WifiMode mode = txVector.getMode();
+  uint32_t chanBW = txVector.GetChannelWidth();
+  uint64_t phyRate = mode.GetPhyRate(txVector);
+
   NS_ASSERT ( mode.GetModulationClass () == WIFI_MOD_CLASS_OFDM );
-  if ( (mode.GetBandwidth () == 10000000 && mode.GetPhyRate () ==  6000000)
-       || (mode.GetBandwidth () == 20000000 && mode.GetPhyRate () == 12000000))
+  if ( (chanBW == 10000000 && phyRate ==  6000000) 
+            || (chanBW == 20000000 && phyRate == 12000000))
     {
       return 48;
     }
-  else if ( (mode.GetBandwidth () == 10000000 && mode.GetPhyRate () == 12000000)
-            || (mode.GetBandwidth () == 20000000 && mode.GetPhyRate () == 24000000))
+  else if ( (chanBW == 10000000 && phyRate == 12000000)
+            || (chanBW == 20000000 && phyRate == 24000000))
     {
       return 96;
     }
-  else if ( (mode.GetBandwidth () == 10000000 && mode.GetPhyRate () == 24000000)
-            || (mode.GetBandwidth () == 20000000 && mode.GetPhyRate () == 48000000))
+  else if ( (chanBW == 10000000 && phyRate == 24000000)
+            || (chanBW == 20000000 && phyRate == 48000000))
     {
       return 192;
     }
-  else if ( (mode.GetBandwidth () == 10000000 && mode.GetPhyRate () == 36000000)
-            || (mode.GetBandwidth () == 20000000 && mode.GetPhyRate () == 72000000))
+  else if ( (chanBW == 10000000 && phyRate == 36000000)
+            || (chanBW == 20000000 && phyRate == 72000000))
     {
       return 288;
     }
@@ -347,46 +351,50 @@ PhySimHelper::GetNCBPS (const WifiMode mode)
 }
 
 uint32_t
-PhySimHelper::GetNDBPS (const WifiMode mode)
+PhySimHelper::GetNDBPS (const WifiTxVector txVector)
 {
+  WifiMode mode = txVector.getMode();
+  uint32_t chanBW = txVector.GetChannelWidth();
+  uint64_t phyRate = mode.GetPhyRate(txVector);
+
   NS_ASSERT ( mode.GetModulationClass () == WIFI_MOD_CLASS_OFDM );
-  if ( (mode.GetBandwidth () == 10000000 && mode.GetDataRate () == 3000000)
-       || (mode.GetBandwidth () == 20000000 && mode.GetDataRate () == 6000000))
+  if ( (chanBW == 10000000 && phyRate == 3000000)
+       || (chanBW == 20000000 && phyRate == 6000000))
     {
       return 24;
     }
-  else if ( (mode.GetBandwidth () == 10000000 && mode.GetDataRate () == 4500000)
-            || (mode.GetBandwidth () == 20000000 && mode.GetDataRate () == 9000000))
+  else if ( (chanBW == 10000000 && phyRate == 4500000)
+            || (chanBW == 20000000 && phyRate == 9000000))
     {
       return 36;
     }
-  else if ( (mode.GetBandwidth () == 10000000 && mode.GetDataRate () ==  6000000)
-            || (mode.GetBandwidth () == 20000000 && mode.GetDataRate () == 12000000))
+  else if ( (chanBW == 10000000 && phyRate ==  6000000)
+            || (chanBW == 20000000 && phyRate == 12000000))
     {
       return 48;
     }
-  else if ( (mode.GetBandwidth () == 10000000 && mode.GetDataRate () ==  9000000)
-            || (mode.GetBandwidth () == 20000000 && mode.GetDataRate () == 18000000))
+  else if ( (chanBW == 10000000 && phyRate ==  9000000)
+            || (chanBW == 20000000 && phyRate == 18000000))
     {
       return 72;
     }
-  else if ( (mode.GetBandwidth () == 10000000 && mode.GetDataRate () == 12000000)
-            || (mode.GetBandwidth () == 20000000 && mode.GetDataRate () == 24000000))
+  else if ( (chanBW == 10000000 && phyRate == 12000000)
+            || (chanBW == 20000000 && phyRate == 24000000))
     {
       return 96;
     }
-  else if ( (mode.GetBandwidth () == 10000000 && mode.GetDataRate () == 18000000)
-            || (mode.GetBandwidth () == 20000000 && mode.GetDataRate () == 36000000))
+  else if ( (chanBW == 10000000 && phyRate == 18000000)
+            || (chanBW == 20000000 && phyRate == 36000000))
     {
       return 144;
     }
-  else if ( (mode.GetBandwidth () == 10000000 && mode.GetDataRate () == 24000000)
-            || (mode.GetBandwidth () == 20000000 && mode.GetDataRate () == 48000000))
+  else if ( (chanBW == 10000000 && phyRate == 24000000)
+            || (chanBW == 20000000 && phyRate == 48000000))
     {
       return 192;
     }
-  else if ( (mode.GetBandwidth () == 10000000 && mode.GetDataRate () == 27000000)
-            || (mode.GetBandwidth () == 20000000 && mode.GetDataRate () == 54000000))
+  else if ( (chanBW == 10000000 && phyRate == 27000000)
+            || (chanBW == 20000000 && phyRate == 54000000))
     {
       return 216;
     }
@@ -396,26 +404,30 @@ PhySimHelper::GetNDBPS (const WifiMode mode)
 }
 
 enum PhySimHelper::ModulationType
-PhySimHelper::GetModulationType (const WifiMode mode)
+PhySimHelper::GetModulationType (const WifiTxVector txVector)
 {
+  WifiMode mode = txVector.getMode();
+  uint32_t chanBW = txVector.GetChannelWidth();
+  uint64_t phyRate = mode.GetPhyRate(txVector);
+
   NS_ASSERT ( mode.GetModulationClass () == WIFI_MOD_CLASS_OFDM );
-  if ( (mode.GetBandwidth () == 10000000 && mode.GetPhyRate () ==  6000000)
-       || (mode.GetBandwidth () == 20000000 && mode.GetPhyRate () == 12000000))
+  if ( (chanBW == 10000000 && phyRate ==  6000000)
+       || (chanBW == 20000000 && phyRate == 12000000))
     {
       return PhySimHelper::BPSK;
     }
-  else if ( (mode.GetBandwidth () == 10000000 && mode.GetPhyRate () == 12000000)
-            || (mode.GetBandwidth () == 20000000 && mode.GetPhyRate () == 24000000))
+  else if ( (chanBW == 10000000 && phyRate == 12000000)
+            || (chanBW == 20000000 && phyRate == 24000000))
     {
       return PhySimHelper::QPSK;
     }
-  else if ( (mode.GetBandwidth () == 10000000 && mode.GetPhyRate () == 24000000)
-            || (mode.GetBandwidth () == 20000000 && mode.GetPhyRate () == 48000000))
+  else if ( (chanBW == 10000000 && phyRate == 24000000)
+            || (chanBW == 20000000 && phyRate == 48000000))
     {
       return PhySimHelper::QAM16;
     }
-  else if ( (mode.GetBandwidth () == 10000000 && mode.GetPhyRate () == 36000000)
-            || (mode.GetBandwidth () == 20000000 && mode.GetPhyRate () == 72000000))
+  else if ( (chanBW == 10000000 && phyRate == 36000000)
+            || (chanBW == 20000000 && phyRate == 72000000))
     {
       return PhySimHelper::QAM64;
     }

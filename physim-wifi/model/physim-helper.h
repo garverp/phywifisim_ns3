@@ -119,25 +119,25 @@ public:
 
   /**
    * Returns the number of coded bits per OFDM symbol for the given WiFi mode
-   * \param mode The WiFi mode for which the number of bits is requested
+   * \param txVector The WiFi mode for which the number of bits is requested
    * \return     The number of coded bits per OFDM symbol
    */
-  static uint32_t GetNCBPS (const WifiMode mode);
+  static uint32_t GetNCBPS (const WifiTxVector txVector);
   /**
    * Returns the number of data bits per OFDM symbol for the given WiFi mode
-   * \param mode The WiFi mode for which the number of bits is requested
+   * \param txVector The WiFi txVector for which the number of bits is requested
    * \return     The number of data bits per OFDM symbol
    */
-  static uint32_t GetNDBPS (const WifiMode mode);
+  static uint32_t GetNDBPS (const WifiTxVector txVector);
   /**
    * Returns the underlying ModulationType that is used by the given WiFi mode. I.e., it should return
    * BPSK for the lowest two data rates, QPSK, for the next two higher rates, QAM16 for the subsequent
    * two higher rates and QAM64 for the two fastest data rates.
    * Note: currently it supports only 10 and 20 MHz channels
-   * \param mode The WiFi mode for which to determine the ModulationType
+   * \param txVecotr The WiFi txVector for which to determine the ModulationType
    * \return     The detected modulation type
    */
-  static enum ModulationType GetModulationType (const WifiMode mode);
+  static enum ModulationType GetModulationType (const WifiTxVector txVector);
   /**
    * Calculates the duration of a packet transmission for a given configuration.
    * \param     size            The packet size in bytes

@@ -8,7 +8,10 @@ def configure(conf):
                                  "IT++ not found")
     if conf.env['ENABLE_ITPP']:
 	conf.env.append_value('CXXFLAGS', '-DNO_INT_SIZE_CHECK')
-        conf.env.append_value('CXXFLAGS','-Wno-error=deprecated-register')
+        # On MAC OSX, IT++ generates a warning about deprecated registers 
+        # which stops compile
+        # g++ 4.9.2 doesn't have this option
+        #conf.env.append_value('CXXFLAGS','-Wno-error=deprecated-register')
         conf.env.append_value('CXXFLAGS','-Wno-error=reorder')
         conf.env.append_value('CXXFLAGS','-Wno-error=overloaded-virtual')
         conf.env.append_value('CXXFLAGS','-Wno-error=deprecated-declarations')
